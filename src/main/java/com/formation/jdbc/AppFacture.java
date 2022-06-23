@@ -8,7 +8,6 @@ public class AppFacture {
 	public static void main(String[] args) {
 		IFactureDao dao = new FactureDaoJDBC();
 		IClientDao daoClient = new ClientDaoJDBC();
-		boolean mongo = false;
 
 		Scanner input = new Scanner(System.in);
 
@@ -30,16 +29,7 @@ public class AppFacture {
 			} else if (line.toLowerCase().equals("2")) {
 				int idFacture = demanderId(input);
 				dao.afficherFacture(idFacture);
-			} else if (line.toLowerCase().equals("3") && mongo) {
-				int idFacture = demanderId(input);
-				Facture f = demanderAjoutFacture(input);
-				f.setId(idFacture);
-				if (dao.ajouterFacture(f)) {
-					System.out.println("Insertion facture OK");
-				} else {
-					System.out.println("Echec insertion facture");
-				}
-			} else if (line.toLowerCase().equals("3") && !mongo) {
+			} else if (line.toLowerCase().equals("3")) {
 				Facture f = demanderAjoutFacture(input);
 				if (dao.ajouterFacture(f)) {
 					System.out.println("Insertion facture OK");
@@ -73,11 +63,9 @@ public class AppFacture {
 				int choix = demanderDao(input);
 				if(choix == 1){
 					dao = new FactureDaoMongoDB();
-					mongo = true;
 					System.out.println("Base Mongo choisie");
 				}else {
 					dao = new FactureDaoJDBC();
-					mongo = false;
 					System.out.println("Base PostgreSQL choisie");
 				}
 			}

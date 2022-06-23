@@ -9,6 +9,8 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 
 public class FactureDaoMongoDB implements IFactureDao{
@@ -18,9 +20,25 @@ public class FactureDaoMongoDB implements IFactureDao{
     @Override
     public boolean ajouterFacture(Facture f) {
         try(DbConnectionMongo conn = new DbConnectionMongo()){
+
+        	//Porjection pour recuperer uniquement l'id
+            Bson projectionFields = Projections.fields(
+                    Projections.include("id"),
+                    Projections.excludeId());
+            
+            //Recuperation du premier document (first) rangés dans l'ordre decroissant des id (donc le dernier)
+            Document doc = conn.getCollection().find()
+                    .projection(projectionFields)
+                    .sort(Sorts.descending("id"))
+                    .first();
+            
+            //Sauvegarde du dernier id
+            int lastId = doc.getInteger("id");
+        	
             Document facture = new Document("_id", new ObjectId());
 
-            facture.append("id", f.getId())
+            //Ajout du lastid + 1 dans l'ajout de facture
+            facture.append("id", lastId+1)
                     .append("id_client", f.getIdClient())
                     .append("montant", f.getMontant())
                     .append("date_facture", f.getDate());
